@@ -20,7 +20,8 @@ services:
     # https://containers.dev/guide/dockerfile
     volumes:
       - ../..:/workspaces:cached
-      # This is here to map 
+      # This is here to map a local directory for bash history so that it is retained.
+      # This lets you access bash history from previous sessions - very useful.
       - ./bash_history:/commandhistory
     # Ditto above.
     command: sleep infinity
@@ -40,6 +41,11 @@ services:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    
+    # This is to expose the port for VNC to view the browser. See link:
+    # https://github.com/SeleniumHQ/docker-selenium?tab=readme-ov-file#using-a-vnc-client
+    ports:
+      - "5900:5900"
 
     networks:
       - selenium_network
@@ -70,6 +76,8 @@ services:
     image: selenium/hub:4.22.0-20240621
     container_name: selenium-hub
     restart: always
+    environment:
+      - SE_NODE_SESSION_TIMEOUT=20
     ports:
       - "4442:4442"
       - "4443:4443"
