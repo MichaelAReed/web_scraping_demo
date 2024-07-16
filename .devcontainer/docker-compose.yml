@@ -1,0 +1,85 @@
+# In general, we are using docker compose to allow us to run Selenium for testing. This
+# requires a container with the target browser setup installed.
+# Selenium provides containers for each browser as well as a hub to route requests to
+# the appropriate browser container.
+# This file is based on the devcontainer docker compose tutorial/example and an example
+# provided on medium for dynamodb and FastAPI but not in a devcontainer.
+# https://containers.dev/guide/dockerfile
+# https://medium.com/nerd-for-tech/introduction-to-fastapi-and-local-dynamodb-595c990ed0f8
+
+version: '3.8'
+services:
+  devservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    container_name: devservice
+    # I'm not entirely sure why this is here yet but it's following the pattern given
+    # in the devcontainer docker compose tutorial/example:
+    # https://containers.dev/guide/dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+      # This is here to map 
+      - ./bash_history:/commandhistory
+    # Ditto above.
+    command: sleep infinity
+    depends_on:
+      - chrome
+
+    networks:
+      - selenium_network
+
+  chrome:
+    image: selenium/node-chrome:4.22.0-20240621
+    shm_size: 2gb
+    restart: always
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+
+    networks:
+      - selenium_network
+
+  # We don't need edge for this project. Not including saves a lot of space.
+  # edge:
+  #   image: selenium/node-edge:4.22.0-20240621
+  #   shm_size: 2gb
+  #   depends_on:
+  #     - selenium-hub
+  #   environment:
+  #     - SE_EVENT_BUS_HOST=selenium-hub
+  #     - SE_EVENT_BUS_PUBLISH_PORT=4442
+  #     - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+
+  # We don't need firefox for this project. Not including saves a lot of space.
+  # firefox:
+  #   image: selenium/node-firefox:4.22.0-20240621
+  #   shm_size: 2gb
+  #   depends_on:
+  #     - selenium-hub
+  #   environment:
+  #     - SE_EVENT_BUS_HOST=selenium-hub
+  #     - SE_EVENT_BUS_PUBLISH_PORT=4442
+  #     - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+
+  selenium-hub:
+    image: selenium/hub:4.22.0-20240621
+    container_name: selenium-hub
+    restart: always
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+
+    networks:
+      - selenium_network
+
+
+networks:
+  selenium_network:
+    name: selenium_network
+    # external: true
