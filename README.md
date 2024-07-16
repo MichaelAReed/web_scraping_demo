@@ -20,4 +20,6 @@ It is recommended that you first have docker installed and use vscode to open th
 
 [Selenium](https://www.selenium.dev/) is a popular, open source and well understood tool for automating browser tasks by using a target browser (eg. Chrome) to render and interact with a webpage just as a user would. The benefit of this is that it provides as close as possible parity to real user interaction. This allows you to automate processes that require lots of javascript and live loading but also allows you to test your own web projects to discover issues that real users would encounter.
 
+It's useful to note here that Selenium has interfaces for several languages other than Python. So you can use your preferred language from options such as Javascript, Java, C#, Ruby and Kotlin.
+
 You can use Selenium just as a python library that makes use of your machine's native browser. But because we wanted this project to be as portable and easy to setup as possible, we used a Selenium maintained Docker image for running the browser that Selenium uses for its automation. This is a very useful boilerplate for web project testing but is maybe less necessary for general web scraping projects where repeatability isn't as fundamental.
